@@ -490,3 +490,26 @@ body.modal-is-open {
     -webkit-overflow-scrolling: touch; /* Vylepšení pro plynulé rolování na iOS */
     overscroll-behavior-y: contain; /* Klíčová vlastnost pro moderní prohlížeče */
 }
+
+/* === STYL PRO TLAČÍTKO ZOBRAZENÍ PDF === */
+/* Přidáno, aby tlačítko pro PDF vypadalo stejně jako pro prezentaci */
+
+.show-pdf-btn {
+    display: block;
+    margin: 25px auto 15px auto;
+    padding: 10px 20px;
+    background-color: #6a2807;
+    color: #faf0d8;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: filter 0.2s ease-in-out;
+}
+.show-pdf-btn:hover {
+    filter: brightness(120%);
+}
+.show-pdf-btn i {
+    margin-right: 8px;
+}

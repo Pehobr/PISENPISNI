@@ -48,10 +48,7 @@ function neux_child_enqueue_assets() {
         // Načtení stylů pro poznámky
         wp_enqueue_style( 'neux-child-poznamky-style', get_stylesheet_directory_uri() . '/css/poznamky.css', array('neux-child-style'), '1.0.0' );
         
-        // Skript pro poznámky (bez závislostí kromě jQuery, pokud se používá)
-        // Původní kód obnova.js deklaroval externí globální proměnné pro TTS
-        // Tyto proměnné byly nyní odstraněny, takže obnova.js už na main.js nezávisí
-        // Poznámky.js na main.js nikdy přímo nezávisely
+        // Skript pro poznámky
         wp_enqueue_script('neux-child-poznamky-js', get_stylesheet_directory_uri() . '/js/poznamky.js', array(), '1.0.0', true);
     }
 }
@@ -82,13 +79,27 @@ function moje_vkladani_dat_do_paticky() {
                 $ai_audio_url = get_post_meta( get_the_ID(), 'ai_audio_url', true ); 
                 $prezentace_src = get_post_meta( get_the_ID(), 'prezentace_embed_src', true );
                 
+                // === ZMĚNA ZAČÍNÁ ZDE ===
+                // Načteme URL z vlastního pole 'pdf_url'
+                $pdf_url = get_post_meta( get_the_ID(), 'pdf_url', true );
+                $pdf_html = '';
+                // Pokud URL existuje...
+                if ( ! empty( $pdf_url ) ) {
+                    // ...dynamicky vytvoříme shortcode s použitím této URL.
+                    $dynamic_shortcode = '[dflip source="' . esc_url( $pdf_url ) . '"][/dflip]';
+                    // A převedeme shortcode na finální HTML kód.
+                    $pdf_html = do_shortcode( $dynamic_shortcode );
+                }
+                // === ZMĚNA KONČÍ ZDE ===
+
                 $obnova_data[] = array(
                     'day' => $day_counter, 
                     'title' => get_the_title(),
                     'content' => apply_filters('the_content', get_the_content()), 
                     'audio_url' => $audio_url,
                     'ai_audio_url' => $ai_audio_url,
-                    'prezentace_embed_src' => $prezentace_src
+                    'prezentace_embed_src' => $prezentace_src,
+                    'pdf_flipbook_html' => $pdf_html // Přidáme hotové HTML do dat pro JavaScript
                 );
                 $day_counter++;
             }

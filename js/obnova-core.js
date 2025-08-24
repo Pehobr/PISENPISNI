@@ -2,7 +2,6 @@
 
 (function(window) {
     const app = {
-        // ... zbytek objektu app zůstává stejný
         elements: {
             appContainer: document.getElementById('obnova-app-container'),
             contentContainer: document.getElementById('content-container'),
@@ -26,12 +25,10 @@
         state: {
             schedule: [],
             isFinished: false,
-            // currentAudio a currentPlayBtn se nyní spravují v ObnovaAudio
         }
     };
 
     const ObnovaCore = {
-        // ... funkce init(), run(), showDay(), generateDaysNav() zůstávají stejné ...
         init: function() {
             if (!app.elements.appContainer) {
                 console.error('Chyba: Kontejner aplikace #obnova-app-container nebyl nalezen.');
@@ -101,11 +98,9 @@
             this.generateDaysNav();
             this.showDay(activeDayIndex);
 
-            // Aktualizujte vstupní pole v menu, pokud je k dispozici
             if (app.elements.sideMenuDateInput) {
                 app.elements.sideMenuDateInput.value = startDateString;
             }
-            // Aktualizujte UI tlačítka pauzy hned po runu
             if (window.ObnovaMenu) window.ObnovaMenu.updatePauseButtonUI();
         },
 
@@ -113,7 +108,6 @@
             const item = app.state.schedule[index];
             if (!app.elements.contentContainer || !item) return;
 
-            // Delegujeme aktualizaci audio/prezentace tlačítek na pod-moduly
             if (window.ObnovaAudio) window.ObnovaAudio.updateFixedControls(item);
 
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
@@ -121,13 +115,36 @@
             const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
             const prezentaceButtonHTML = item.prezentace_embed_src ? `<button class="show-prezentace-btn" data-prezentace-src="${item.prezentace_embed_src}"><i class="fas fa-chalkboard-teacher"></i>Zobrazit prezentaci</button>` : '';
 
+            let pdfButtonHTML = '';
+            if (item.pdf_flipbook_html) {
+                pdfButtonHTML = `
+                    <button class="show-pdf-btn" data-day-index="${index}">
+                        <i class="fas fa-file-pdf"></i> Zobrazit PDF
+                    </button>
+                    <div class="pdf-container" id="pdf-container-${index}" style="display:none; margin-top: 20px;">
+                        ${item.pdf_flipbook_html}
+                    </div>
+                `;
+            }
+
             app.elements.contentContainer.innerHTML = `
                 <article data-day-index="${index}">
                     ${pausedMessage}${finishedMessage}
                     <h2>${item.title || 'Načítání...'}</h2>
                     <div class="entry-content">${item.content || ''}</div>
                     ${prezentaceButtonHTML}
+                    ${pdfButtonHTML}
                 </article>`;
+
+            // Po vložení nového obsahu musíme znovu inicializovat DearFlip plugin.
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.flipBook !== 'undefined') {
+                // OPRAVA ZDE: Cílíme na třídu '_df_book', kterou má flipbook hned po vložení.
+                const newFlipbook = app.elements.contentContainer.querySelector('._df_book:not(.dflip-initialized)');
+                if (newFlipbook) {
+                    jQuery(newFlipbook).flipBook();
+                    jQuery(newFlipbook).addClass('dflip-initialized');
+                }
+            }
 
             document.querySelectorAll('.day-link').forEach(link => link.classList.remove('active'));
             const activeLink = document.querySelector(`.day-link[data-day-index="${index}"]`);
@@ -142,34 +159,26 @@
                 `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.day}`}</a>`
             ).join('');
         },
-
-        /**
-         * ZCELA NAHRAĎTE PŮVODNÍ FUNKCI TOUTO NOVOU VERZÍ
-         */
+        
         saveAndRun: function(dateValue) {
             if (!dateValue) {
                 alert('Prosím, zvolte datum začátku.');
                 return;
             }
             
-            // --- NOVÁ VALIDAČNÍ LOGIKA ---
             const selectedDate = new Date(dateValue);
             const today = new Date();
             const limitDate = new Date();
     
-            // Nastavíme limit na 7 dní v minulosti
             limitDate.setDate(today.getDate() - 7);
     
-            // Nulujeme časovou složku pro přesné porovnání pouze dnů
             selectedDate.setHours(0, 0, 0, 0);
             limitDate.setHours(0, 0, 0, 0);
     
-            // Zkontrolujeme, zda není zvolené datum příliš staré
             if (selectedDate < limitDate) {
                 alert('Datum začátku nemůže být nastaveno o více než 7 dní v minulosti. Prosím, zvolte jiné datum.');
-                return; // Zastavíme další provádění funkce
+                return;
             }
-            // --- KONEC NOVÉ VALIDAČNÍ LOGIKY ---
 
             localStorage.setItem('obnovaStartDate', dateValue);
             localStorage.removeItem('obnovaIsPaused');
@@ -182,12 +191,12 @@
         },
 
         setupEventListeners: function() {
-            // ... tato funkce zůstává beze změny ...
             document.body.addEventListener('click', (event) => {
                 const target = event.target;
                 const playBtn = target.closest('.play-tts-btn');
                 const prezentaceBtn = target.closest('.show-prezentace-btn');
                 const dayLink = target.closest('.day-link');
+                const pdfBtn = target.closest('.show-pdf-btn');
 
                 if (dayLink) {
                     event.preventDefault();
@@ -195,7 +204,17 @@
                 } else if (playBtn && window.ObnovaAudio) {
                     event.preventDefault();
                     window.ObnovaAudio.handleAudioPlayback(playBtn);
-                } else if (prezentaceBtn && window.ObnovaPrezentace) {
+                } 
+                else if (pdfBtn) {
+                    event.preventDefault();
+                    const dayIndex = pdfBtn.dataset.dayIndex;
+                    const pdfContainer = document.getElementById(`pdf-container-${dayIndex}`);
+                    if (pdfContainer) {
+                        const isHidden = pdfContainer.style.display === 'none';
+                        pdfContainer.style.display = isHidden ? 'block' : 'none';
+                    }
+                } 
+                else if (prezentaceBtn && window.ObnovaPrezentace) {
                     event.preventDefault();
                     window.ObnovaPrezentace.openPrezentaceModal(prezentaceBtn.dataset.prezentaceSrc);
                 }
