@@ -1,0 +1,120 @@
+/* Základní kontejner aplikace */
+#poznamky-app-container {
+    background-color: #faf0d8; /* Stejné pozadí jako obnova */
+    border-radius: 10px;
+    margin: 0;
+    padding: 1px 20px 20px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    min-height: 70vh;
+}
+
+/* Hlavička */
+.poznamky-header h1 {
+    font-size: 1.5rem;
+    color: #4e1c05;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 25px;
+}
+
+/* Formulář pro zadání poznámky */
+.poznamka-form {
+    display: flex;
+    flex-direction: column;
+}
+.poznamka-form label {
+    font-weight: bold;
+    color: #4e1c05;
+    margin-bottom: 8px;
+}
+.poznamka-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9d1c3;
+    border-radius: 4px;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+#save-poznamka-btn {
+    padding: 12px;
+    background-color: #6a2807;
+    color: #faf0d8;
+    border: none;
+    border-radius: 8px; /* Změna zde */
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: filter 0.2s ease-in-out;
+}
+#save-poznamka-btn:hover {
+    filter: brightness(120%);
+}
+
+/* Akční tlačítka pod formulářem */
+.poznamky-actions {
+    margin: 25px 0;
+    border-top: 1px solid #e1d8c2;
+    border-bottom: 1px solid #e1d8c2;
+    padding: 15px 0;
+    display: flex;
+    gap: 15px;
+}
+#toggle-poznamky-btn, #export-poznamky-btn {
+    padding: 10px 15px;
+    background-color: #4e1c05;
+    color: #faf0d8;
+    border: 1px solid transparent;
+    border-radius: 8px; /* Změna zde */
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+#toggle-poznamky-btn:hover, #export-poznamky-btn:hover {
+    background-color: #faf0d8;
+    color: #4e1c05;
+    border-color: #4e1c05;
+}
+
+/* ----- FINÁLNÍ STYLY PRO SEZNAM POZNÁMEK ----- */
+
+#poznamky-list-container {
+    margin-top: 20px;
+}
+
+.poznamka-item {
+    position: relative; /* Důležité pro pozicování mazacího tlačítka */
+    background: #fff;
+    border: 1px solid #e9e2d5;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.delete-poznamka-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-size: 1.6rem;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 50%;
+    transition: color 0.2s, background-color 0.2s;
+}
+.delete-poznamka-btn:hover {
+    color: #d9534f;
+    background-color: #f5f5f5;
+}
+
+.poznamka-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #342E1C;
+    /* Zajistíme, aby text nezasahoval pod tlačítko */
+    padding-right: 25px; 
+}

@@ -1,0 +1,492 @@
+/* ========================================================================= */
+/* STYLY PRO DUCHOVNÍ OBNOVU - APLIKACE                                      */
+/* ========================================================================= */
+
+#obnova-app-container {
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+    background-color: #faf0d8;
+    border-radius: 10px;
+    margin: 0px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    min-height: 70vh;
+}
+
+#main-content {
+    width: 100%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #e1d8c2;
+    border-bottom: 1px solid #d1c8b8;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.app-header h1 {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: 700;
+    color: #4e1c05;
+}
+
+.days-nav-bar {
+    background-color: #e1d8c2;
+    padding: 10px 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #d1c8b8;
+    -webkit-overflow-scrolling: touch;
+}
+.days-nav-bar::-webkit-scrollbar { display: none; }
+
+a.day-link {
+    display: inline-block; padding: 8px 16px; margin: 0 4px;
+    border-radius: 18px; text-decoration: none; color: #4e1c05;
+    background-color: #ede6d8; transition: all 0.2s ease;
+    font-size: 0.9rem; border: 1px solid transparent;
+}
+
+a.day-link.active {
+    background-color: #4e1c05; color: #faf0d8; font-weight: bold; border-color: #6a2807;
+}
+
+main#content-container {
+    padding: 20px 10px;
+    line-height: 1.6;
+    touch-action: pan-y;
+}
+
+
+
+main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; text-align: center; }
+.entry-content { font-size: 1rem; color: #342E1C; }
+
+
+/* === POSTRANNÍ MENU (VPRAVO) === */
+#side-menu {
+    position: fixed; top: 0; right: 0; left: auto;
+    width: 280px; height: 100%;
+    background-color: #faf0d8;
+    z-index: 99999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column;
+}
+.side-menu-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 15px; border-bottom: 1px solid #e9e2d5;
+}
+.side-menu-header h4 { margin: 0; font-size: 1.2rem; color: #4e1c05; }
+#menu-toggle-btn, #close-menu-btn {
+    background: none; border: none; font-size: 1.8rem;
+    cursor: pointer; padding: 5px; line-height: 1; color: #4e1c05;
+}
+.side-menu-content { padding: 20px; overflow-y: auto; }
+#app-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(40, 20, 5, 0.6); z-index: 99998; display: none;
+}
+/* ZMĚNA: Cílení na kontejner aplikace pro otevření menu */
+#obnova-app-container.menu-open #main-content { transform: translateX(-280px); }
+#obnova-app-container.menu-open #side-menu { transform: translateX(0); }
+
+
+/* --- Nastavení v menu --- */
+#settings, #pause-control { margin-bottom: 25px; }
+#settings h5, #pause-control h5 { margin-top: 0; margin-bottom: 15px; font-size: 1rem; color: #555; border-bottom: 1px solid #e9e2d5; padding-bottom: 10px;}
+#settings label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+#settings input[type="date"] {
+    width: 100%; padding: 8px; border: 1px solid #d9d1c3;
+    border-radius: 4px; margin-bottom: 15px;
+}
+#settings button {
+    width: 100%; padding: 10px; background-color: #4e1c05; color: #faf0d8;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;
+}
+.feedback-msg { color: #5cb85c; margin-top: 10px; font-weight: bold; }
+
+/* === STYLY PRO ÚVODNÍ OBRAZOVKU === */
+#initial-setup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(250, 240, 216, 0.98);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#initial-setup-box {
+    background: #fff; padding: 30px 40px; border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    text-align: center; max-width: 400px;
+    border: 1px solid #e9e2d5;
+}
+#initial-setup-box h2 { margin-top: 0; color: #4e1c05; }
+#initial-setup-box p { color: #342E1C; margin-bottom: 20px; }
+#initial-setup-box label { font-weight: bold; color: #4e1c05; }
+#initial-setup-box input[type="date"] {
+    width: 100%; padding: 10px; border: 1px solid #d9d1c3;
+    border-radius: 4px; margin: 10px 0 20px 0; text-align: center; font-size: 1.1rem;
+}
+#initial-setup-box button {
+    width: 100%; padding: 12px; background-color: #6a2807; color: #faf0d8;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* === Sjednocený styl pro tlačítka na úvodní obrazovce === */
+#initial-setup-box button,
+#initial-setup-box .info-link {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    background-color: #6a2807;
+    color: #faf0d8;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: filter 0.2s ease-in-out;
+}
+
+#initial-setup-box .info-link {
+    margin-top: 15px;
+}
+
+#initial-setup-box button:hover,
+#initial-setup-box .info-link:hover {
+    filter: brightness(120%);
+}
+
+
+/* === DOPLNĚNÁ OPRAVA: Skrytí poslední čáry a odstavce v obsahu dne === */
+#content-container .entry-content > hr:last-of-type,
+#content-container .entry-content > p:last-of-type {
+    display: none;
+}
+
+/* ========================================================================= */
+/* VLASTNÍ STYLY PRO WORDPRESS AUDIO PŘEHRÁVAČ (MEDIAELEMENT.JS)             */
+/* ========================================================================= */
+
+.mejs-container {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.mejs-controls {
+    background: #4e1c05 !important;
+}
+
+.mejs-time-total {
+    background: #6a2807 !important;
+}
+
+.mejs-time-loaded {
+    background: #8c6f5a !important;
+}
+
+.mejs-time-current {
+    background: #faf0d8 !important;
+}
+
+.mejs-time-hovered {
+    background: #342E1C !important;
+    border-color: #342E1C !important;
+}
+
+.mejs-controls .mejs-button button,
+.mejs-controls .mejs-time,
+.mejs-controls .mejs-duration {
+    color: #faf0d8 !important;
+}
+
+.mejs-horizontal-volume-slider .mejs-horizontal-volume-current {
+    background: #faf0d8 !important;
+}
+
+.mejs-horizontal-volume-slider .mejs-horizontal-volume-total {
+    background: #6a2807 !important;
+}
+
+/* ========================================================================= */
+/* Vlastní styly pro WordPress Audio Playlist                              */
+/* ========================================================================= */
+
+.wp-playlist.wp-playlist-light {
+    background: transparent;
+}
+
+.wp-playlist-light .wp-playlist-item {
+    padding: 10px 15px;
+    background-color: #e1d8c2;
+    border-bottom: 1px solid #d1c8b8;
+    transition: background-color 0.2s ease;
+}
+
+.wp-playlist-light .wp-playlist-item a,
+.wp-playlist-light .wp-playlist-item .wp-playlist-item-length {
+    color: #4e1c05;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.wp-playlist-light .wp-playlist-item:hover {
+    background-color: #ede6d8;
+}
+
+.wp-playlist-light .wp-playlist-item.wp-playlist-playing {
+    background-color: #4e1c05;
+}
+
+.wp-playlist-light .wp-playlist-item.wp-playlist-playing a,
+.wp-playlist-light .wp-playlist-item.wp-playlist-playing .wp-playlist-item-length {
+    color: #faf0d8;
+    font-weight: 700;
+}
+
+.wp-playlist-light .wp-playlist-tracks .wp-playlist-item:last-child {
+    border-bottom: none;
+}
+
+
+/* ========================================================================= */
+/* NOVÉ STYLY PRO TLAČÍTKO POZASTAVENÍ OBNOVY                                 */
+/* ========================================================================= */
+
+#pause-resume-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#pause-resume-btn {
+    background-color: #d9534f;
+    color: #ffffff;
+}
+#pause-resume-btn:hover {
+    background-color: #c9302c;
+}
+
+#pause-resume-btn.paused-state {
+    background-color: #5cb85c;
+    color: #ffffff;
+}
+#pause-resume-btn.paused-state:hover {
+    background-color: #449d44;
+}
+
+/* ========================================================================= */
+/* FINÁLNÍ STYLY PRO FIXNÍ AUDIO TLAČÍTKA DOLE (vzhled 3.0)                  */
+/* ========================================================================= */
+
+/* Společná základna pro obě tlačítka */
+.play-tts-btn {
+    position: fixed;
+    bottom: 70px;
+    height: 50px; /* Snížíme výšku pro elegantnější ovál */
+    border: 2px solid #faf0d8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+
+    /* Sjednocená barevnost pro obě tlačítka */
+    background-color: #4e1c05;
+    color: #faf0d8;
+    font-weight: bold;
+}
+
+/* Klasické tlačítko vpravo - zůstává kulaté */
+.play-tts-btn.human-audio {
+    right: 20px;
+    width: 50px; /* Přizpůsobeno výšce */
+    border-radius: 50%;
+    font-size: 1.1rem;
+}
+
+/* AI tlačítko vlevo - nové, oválné */
+.play-tts-btn.ai-audio {
+    left: 20px;
+    width: auto; /* Šířka se přizpůsobí obsahu */
+    border-radius: 25px; /* Polovina výšky pro dokonalý ovál */
+    padding: 0 18px; /* Vnitřní mezery po stranách */
+    font-size: 1rem;
+}
+
+/* Hover efekt pro obě tlačítka */
+.play-tts-btn:hover {
+    filter: brightness(130%);
+    transform: scale(1.05);
+}
+
+/* Společný styl pro obě tlačítka, když přehrávají */
+.play-tts-btn.playing {
+    background-color: #d9534f;
+    border-color: #fff;
+}
+
+/* ========================================================================= */
+/* STYLY PRO MODÁLNÍ OKNO PREZENTACE                                         */
+/* ========================================================================= */
+
+/* Tlačítko pro zobrazení prezentace */
+.show-prezentace-btn {
+    display: block;
+    margin: 25px auto 15px auto;
+    padding: 10px 20px;
+    background-color: #6a2807;
+    color: #faf0d8;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: filter 0.2s ease-in-out;
+}
+.show-prezentace-btn:hover {
+    filter: brightness(120%);
+}
+.show-prezentace-btn i {
+    margin-right: 8px;
+}
+
+
+/* Překryvná vrstva za modálním oknem */
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+}
+
+/* Samotné modální okno */
+#prezentace-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 80%;
+    max-width: 1100px;
+    background: #333;
+    z-index: 10001;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Kontejner pro iframe uvnitř modálu */
+#modal-content {
+    width: 100%;
+    height: 100%;
+}
+
+/* Iframe uvnitř modálu */
+#modal-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 5px;
+}
+
+/* Tlačítko pro zavření modálu */
+#modal-close-btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    
+    /* Změny dle vašeho návrhu */
+    background: transparent; /* Bez bílého kolečka */
+    border: none; /* Bez rámečku */
+    color: #fff; /* Bílý křížek */
+    
+    font-size: 2.5rem; /* Mírně větší křížek pro lepší viditelnost */
+    font-weight: 300;  /* Tenčí, elegantnější křížek */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Stín pro lepší čitelnost */
+    
+    cursor: pointer;
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+/* ========================================================================= */
+/* RESPONZIVNÍ ÚPRAVA PRO MODÁL PREZENTACE (MOBILNÍ ZOBRAZENÍ)             */
+/* ========================================================================= */
+
+/* Aplikuje se na všechna zařízení s šířkou do 950px (pokryje mobily na výšku i na šířku) */
+@media screen and (max-width: 950px) {
+    /* Modální okno na celou obrazovku */
+    #prezentace-modal {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform: none;
+        border-radius: 0;
+        padding: 5px;
+        padding-top: 45px; /* Místo pro zavírací tlačítko */
+    }
+
+    /* Upravená pozice zavíracího tlačítka */
+    #modal-close-btn {
+        top: 5px;
+        right: 5px;
+    }
+}
+
+/* ========================================================================= */
+/* DEAKTIVACE PULL-TO-REFRESH V MODÁLU (DEFINITIVNÍ VERZE)                   */
+/* ========================================================================= */
+
+/* Krok 1: Zablokujeme rolování hlavní stránky, když je modál aktivní.
+   Cílíme na všechny možné kontejnery a použijeme !important pro jistotu. */
+html.modal-is-open,
+body.modal-is-open {
+    overflow: hidden !important;
+}
+
+/* Krok 2: Samotnému modálnímu oknu povolíme rolování, ale "uvězníme" ho.
+   Toto zabrání "přetečení" scrollu ven a spuštění obnovení stránky. */
+#prezentace-modal {
+    overflow-y: auto; /* Povolí rolování uvnitř modálu, pokud je potřeba */
+    -webkit-overflow-scrolling: touch; /* Vylepšení pro plynulé rolování na iOS */
+    overscroll-behavior-y: contain; /* Klíčová vlastnost pro moderní prohlížeče */
+}
