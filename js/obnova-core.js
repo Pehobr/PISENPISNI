@@ -20,7 +20,7 @@
             modalOverlay: document.getElementById('modal-overlay'),
             modalCloseBtn: document.getElementById('modal-close-btn'),
             modalIframe: document.querySelector('#prezentace-modal iframe'),
-            // NOVÉ: Elementy pro modál PDF
+            // Elementy pro modál PDF
             pdfModal: document.getElementById('pdf-modal'),
             pdfModalOverlay: document.getElementById('pdf-modal-overlay'),
             pdfModalCloseBtn: document.getElementById('pdf-modal-close-btn'),
@@ -52,7 +52,6 @@
         },
 
         run: function() {
-            // ... tato funkce zůstává beze změny ...
             if (typeof obnovaApp === 'undefined' || !obnovaApp.posts) {
                 console.error('Chyba: Data aplikace (obnovaApp) nebyla nalezena.');
                 return;
@@ -106,24 +105,61 @@
             const item = app.state.schedule[index];
             if (!app.elements.contentContainer || !item) return;
 
-            // Aktualizace tlačítek
             if (window.ObnovaAudio) window.ObnovaAudio.updateFixedControls(item);
             this.updateFixedActionButtons(item, index);
 
-            const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
-            const finishedMessage = (app.state.isFinished && index === app.state.schedule.length - 1) ? `<p class="finished-message">Duchovní obnova je u konce.</p>` : '';
-            const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
-            
-            // ODSTRANĚNO: Tlačítka se již negenerují zde
-            // const prezentaceButtonHTML = ...
-            // const pdfButtonHTML = ...
+            if (item.type === 'sunday') {
+                // --- NOVÁ LOGIKA PRO NEDĚLI ---
+                let sundayContentHTML = `
+                    <article data-day-index="${index}">
+                        <h2>${item.title || 'Nedělní ohlédnutí'}</h2>
+                        <div class="entry-content">
+                            <p style="text-align: center; font-style: italic;">Inspirace, které nás provázely uplynulým týdnem:</p>
+                            <div class="sunday-summary">
+                `;
 
-            app.elements.contentContainer.innerHTML = `
-                <article data-day-index="${index}">
-                    ${pausedMessage}${finishedMessage}
-                    <h2>${item.title || 'Načítání...'}</h2>
-                    <div class="entry-content">${item.content || ''}</div>
-                </article>`;
+                const startIndex = Math.max(0, index - 6);
+                const weekDays = app.state.schedule.slice(startIndex, index);
+                let inspirationFound = false;
+
+                weekDays.forEach(dayItem => {
+                    if (dayItem.type === 'post') {
+                        const inspirationHtml = this.extractInspiration(dayItem.content);
+                        if (inspirationHtml) {
+                            inspirationFound = true;
+                            sundayContentHTML += `
+                                <div class="summary-item">
+                                    <h4>Den ${dayItem.day}: ${dayItem.title}</h4>
+                                    <div>${inspirationHtml}</div>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+
+                if (!inspirationFound) {
+                    sundayContentHTML += '<p style="text-align: center;">Pro tento týden nebyly nalezeny žádné inspirace.</p>';
+                }
+
+                sundayContentHTML += `
+                            </div>
+                        </div>
+                    </article>
+                `;
+                app.elements.contentContainer.innerHTML = sundayContentHTML;
+            } else {
+                // --- PŮVODNÍ LOGIKA PRO BĚŽNÉ DNY ---
+                const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
+                const finishedMessage = (app.state.isFinished && index === app.state.schedule.length - 1) ? `<p class="finished-message">Duchovní obnova je u konce.</p>` : '';
+                const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
+                
+                app.elements.contentContainer.innerHTML = `
+                    <article data-day-index="${index}">
+                        ${pausedMessage}${finishedMessage}
+                        <h2>${item.title || 'Načítání...'}</h2>
+                        <div class="entry-content">${item.content || ''}</div>
+                    </article>`;
+            }
 
             document.querySelectorAll('.day-link').forEach(link => link.classList.remove('active'));
             const activeLink = document.querySelector(`.day-link[data-day-index="${index}"]`);
@@ -132,8 +168,27 @@
                 activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         },
+        
+        // Pomocná funkce pro extrakci obsahu "Inspirace"
+        extractInspiration: function(htmlContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const accordionItems = tempDiv.querySelectorAll('.accordion-item');
+            for (const item of accordionItems) {
+                const button = item.querySelector('.accordion-toggle');
+                if (button && button.textContent.trim() === 'Inspirace') {
+                    const hiddenTextDiv = item.querySelector('.hidden-text');
+                    if (hiddenTextDiv) {
+                        const contentClone = hiddenTextDiv.cloneNode(true);
+                        const hr = contentClone.querySelector('hr');
+                        if (hr) hr.remove();
+                        return contentClone.innerHTML.trim();
+                    }
+                }
+            }
+            return null;
+        },
 
-        // NOVÁ FUNKCE: Aktualizace fixních tlačítek (Prezentace, PDF)
         updateFixedActionButtons: function(item, index) {
             const { prezentaceFixedBtn, pdfFixedBtn } = app.elements;
 
@@ -179,14 +234,12 @@
         },
 
         generateDaysNav: function() {
-            // ... tato funkce zůstává beze změny ...
             app.elements.daysNav.innerHTML = app.state.schedule.map((item, index) =>
                 `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.day}`}</a>`
             ).join('');
         },
         
         saveAndRun: function(dateValue) {
-            // ... tato funkce zůstává beze změny ...
             if (!dateValue) {
                 alert('Prosím, zvolte datum začátku.');
                 return;
@@ -217,7 +270,6 @@
                 const playBtn = target.closest('.play-tts-btn');
                 const dayLink = target.closest('.day-link');
                 
-                // Zjednodušená delegace, stará tlačítka jsou pryč
                 if (dayLink) {
                     event.preventDefault();
                     this.showDay(parseInt(dayLink.dataset.dayIndex, 10));
@@ -227,7 +279,6 @@
                 }
             });
 
-            // Přidáme posluchače pro nová fixní tlačítka
             app.elements.prezentaceFixedBtn?.addEventListener('click', () => {
                 if (window.ObnovaPrezentace) {
                    window.ObnovaPrezentace.openPrezentaceModal(app.elements.prezentaceFixedBtn.dataset.prezentaceSrc);
@@ -238,11 +289,9 @@
                this.openPdfModal(parseInt(dayIndex, 10));
            });
 
-            // Posluchače pro zavření modálů
             app.elements.pdfModalCloseBtn?.addEventListener('click', () => this.closePdfModal());
             app.elements.pdfModalOverlay?.addEventListener('click', () => this.closePdfModal());
 
-            // Posluchače pro nastavení
             app.elements.setupBtn?.addEventListener('click', () => this.saveAndRun(app.elements.setupDateInput.value));
             app.elements.settingsBtn?.addEventListener('click', () => this.saveAndRun(app.elements.sideMenuDateInput.value));
         }
