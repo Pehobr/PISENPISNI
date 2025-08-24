@@ -513,3 +513,97 @@ body.modal-is-open {
 .show-pdf-btn i {
     margin-right: 8px;
 }
+/* ========================================================================= */
+/* STYLY PRO MODÁLNÍ OKNO PDF (FINÁLNÍ OPRAVENÁ VERZE)                     */
+/* ========================================================================= */
+
+/* Překryvná vrstva za modálním oknem */
+#pdf-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+}
+
+/* Samotné modální okno */
+#pdf-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90vh; /* Použijeme vh pro lepší přizpůsobení výšce obrazovky */
+    max-width: 1100px;
+    max-height: 95%; /* Maximální výška, aby se vešlo na menší obrazovky */
+    background: #faf0d8;
+    z-index: 10001;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; TOTO JSME ODEBRALI, aby byl vidět křížek */
+}
+
+/* Kontejner pro obsah uvnitř modálu */
+#pdf-modal-content {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    border-radius: 5px;
+    overflow: auto; /* TOTO JSME ZMĚNILI, aby bylo možné rolovat */
+    -webkit-overflow-scrolling: touch; /* Vylepšení pro plynulé rolování na iOS */
+}
+
+/* Tlačítko pro zavření modálu */
+#pdf-modal-close-btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    background: #4e1c05;
+    border: 2px solid #faf0d8;
+    border-radius: 50%;
+    color: #faf0d8;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: none;
+    cursor: pointer;
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#pdf-modal-close-btn:hover {
+    transform: scale(1.1);
+    background-color: #6a2807;
+}
+
+/* Responzivní úpravy pro PDF modál */
+@media screen and (max-width: 950px) {
+    #pdf-modal {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        top: 0;
+        left: 0;
+        transform: none;
+        border-radius: 0;
+        padding: 5px;
+        padding-top: 45px;
+    }
+
+    #pdf-modal-close-btn {
+        top: 5px;
+        right: 5px;
+    }
+}

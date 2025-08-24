@@ -15,10 +15,17 @@
             sideMenuDateInput: document.getElementById('start-date-input'),
             settingsBtn: document.getElementById('save-settings-btn'),
             pauseBtn: document.getElementById('pause-resume-btn'),
+            // Elementy pro modál prezentace
             prezentaceModal: document.getElementById('prezentace-modal'),
             modalOverlay: document.getElementById('modal-overlay'),
             modalCloseBtn: document.getElementById('modal-close-btn'),
             modalIframe: document.querySelector('#prezentace-modal iframe'),
+            // NOVÉ: Elementy pro modál PDF
+            pdfModal: document.getElementById('pdf-modal'),
+            pdfModalOverlay: document.getElementById('pdf-modal-overlay'),
+            pdfModalCloseBtn: document.getElementById('pdf-modal-close-btn'),
+            pdfModalContent: document.getElementById('pdf-modal-content'),
+            // Audio tlačítka
             humanAudioBtn: document.querySelector('.play-tts-btn.human-audio'),
             aiAudioBtn: document.querySelector('.play-tts-btn.ai-audio'),
         },
@@ -35,7 +42,6 @@
                 return;
             }
 
-            // Inicializace pod-modulů s předáním app.elements
             if (window.ObnovaMenu) window.ObnovaMenu.init(app.elements);
             if (window.ObnovaAudio) window.ObnovaAudio.init(app.elements);
             if (window.ObnovaPrezentace) window.ObnovaPrezentace.init(app.elements);
@@ -45,59 +51,50 @@
         },
 
         run: function() {
+            // ... tato funkce zůstává beze změny ...
             if (typeof obnovaApp === 'undefined' || !obnovaApp.posts) {
                 console.error('Chyba: Data aplikace (obnovaApp) nebyla nalezena.');
                 return;
             }
-
             const { posts, sundayPost } = obnovaApp;
             const startDateString = localStorage.getItem('obnovaStartDate');
-
             if (!startDateString) {
                 app.elements.setupOverlay.style.display = 'flex';
                 return;
             }
-
             app.elements.setupOverlay.style.display = 'none';
-
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
             const startDate = new Date(startDateString);
             const today = isPaused ? new Date(localStorage.getItem('obnovaPausedDate')) : new Date();
             startDate.setHours(0, 0, 0, 0);
             today.setHours(0, 0, 0, 0);
-
             const diffTime = today - startDate;
             if (diffTime < 0) {
                 app.elements.daysNav.innerHTML = '';
                 app.elements.contentContainer.innerHTML = `<p style="text-align:center; padding: 20px;">Vaše obnova ještě nezačala. Začne <strong>${startDate.toLocaleDateString('cs-CZ')}</strong>.</p>`;
                 return;
             }
-
             app.state.schedule = [];
             let postIndex = 0;
             const totalDaysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
             for (let i = 0; i <= totalDaysElapsed; i++) {
                 const currentDate = new Date(startDate.getTime());
                 currentDate.setDate(startDate.getDate() + i);
-                if (currentDate.getDay() === 0) { // Neděle
+                if (currentDate.getDay() === 0) {
                     app.state.schedule.push({ type: 'sunday', ...sundayPost });
-                } else { // Pracovní den
+                } else {
                     if (postIndex < posts.length) {
                         app.state.schedule.push({ type: 'post', ...posts[postIndex] });
                         postIndex++;
                     } else {
-                        break; // Všechny příspěvky zpracovány
+                        break;
                     }
                 }
             }
-            
             app.state.isFinished = postIndex >= posts.length;
             const activeDayIndex = app.state.schedule.length - 1;
-            
             this.generateDaysNav();
             this.showDay(activeDayIndex);
-
             if (app.elements.sideMenuDateInput) {
                 app.elements.sideMenuDateInput.value = startDateString;
             }
@@ -115,15 +112,13 @@
             const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
             const prezentaceButtonHTML = item.prezentace_embed_src ? `<button class="show-prezentace-btn" data-prezentace-src="${item.prezentace_embed_src}"><i class="fas fa-chalkboard-teacher"></i>Zobrazit prezentaci</button>` : '';
 
+            // Změna: Generujeme pouze tlačítko, pokud existuje PDF.
             let pdfButtonHTML = '';
             if (item.pdf_flipbook_html) {
                 pdfButtonHTML = `
                     <button class="show-pdf-btn" data-day-index="${index}">
                         <i class="fas fa-file-pdf"></i> Zobrazit PDF
                     </button>
-                    <div class="pdf-container" id="pdf-container-${index}" style="display:none; margin-top: 20px;">
-                        ${item.pdf_flipbook_html}
-                    </div>
                 `;
             }
 
@@ -136,16 +131,6 @@
                     ${pdfButtonHTML}
                 </article>`;
 
-            // Po vložení nového obsahu musíme znovu inicializovat DearFlip plugin.
-            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.flipBook !== 'undefined') {
-                // OPRAVA ZDE: Cílíme na třídu '_df_book', kterou má flipbook hned po vložení.
-                const newFlipbook = app.elements.contentContainer.querySelector('._df_book:not(.dflip-initialized)');
-                if (newFlipbook) {
-                    jQuery(newFlipbook).flipBook();
-                    jQuery(newFlipbook).addClass('dflip-initialized');
-                }
-            }
-
             document.querySelectorAll('.day-link').forEach(link => link.classList.remove('active'));
             const activeLink = document.querySelector(`.day-link[data-day-index="${index}"]`);
             if (activeLink) {
@@ -154,32 +139,60 @@
             }
         },
 
+        // NOVÁ FUNKCE: Otevření modálního okna s PDF
+        openPdfModal: function(dayIndex) {
+            const item = app.state.schedule[dayIndex];
+            if (!item || !item.pdf_flipbook_html) return;
+
+            // Vložíme HTML flipbooku do modálního okna
+            app.elements.pdfModalContent.innerHTML = item.pdf_flipbook_html;
+            
+            // Zobrazíme modál a překryv
+            app.elements.pdfModal.style.display = 'flex';
+            app.elements.pdfModalOverlay.style.display = 'block';
+            document.body.classList.add('modal-is-open');
+
+            // Klíčový krok: Inicializujeme DearFlip plugin na nově vloženém obsahu
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.flipBook !== 'undefined') {
+                const newFlipbook = app.elements.pdfModalContent.querySelector('._df_book');
+                if (newFlipbook) {
+                    jQuery(newFlipbook).flipBook();
+                }
+            }
+        },
+
+        // NOVÁ FUNKCE: Zavření modálního okna s PDF
+        closePdfModal: function() {
+            app.elements.pdfModal.style.display = 'none';
+            app.elements.pdfModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-is-open');
+            // Vyčistíme obsah, aby nezůstával v paměti
+            app.elements.pdfModalContent.innerHTML = '';
+        },
+
         generateDaysNav: function() {
+            // ... tato funkce zůstává beze změny ...
             app.elements.daysNav.innerHTML = app.state.schedule.map((item, index) =>
                 `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.day}`}</a>`
             ).join('');
         },
         
         saveAndRun: function(dateValue) {
+            // ... tato funkce zůstává beze změny ...
             if (!dateValue) {
                 alert('Prosím, zvolte datum začátku.');
                 return;
             }
-            
             const selectedDate = new Date(dateValue);
             const today = new Date();
             const limitDate = new Date();
-    
             limitDate.setDate(today.getDate() - 7);
-    
             selectedDate.setHours(0, 0, 0, 0);
             limitDate.setHours(0, 0, 0, 0);
-    
             if (selectedDate < limitDate) {
                 alert('Datum začátku nemůže být nastaveno o více než 7 dní v minulosti. Prosím, zvolte jiné datum.');
                 return;
             }
-
             localStorage.setItem('obnovaStartDate', dateValue);
             localStorage.removeItem('obnovaIsPaused');
             localStorage.removeItem('obnovaPausedDate');
@@ -205,20 +218,21 @@
                     event.preventDefault();
                     window.ObnovaAudio.handleAudioPlayback(playBtn);
                 } 
+                // Změna: Klik na PDF tlačítko nyní volá novou funkci
                 else if (pdfBtn) {
                     event.preventDefault();
                     const dayIndex = pdfBtn.dataset.dayIndex;
-                    const pdfContainer = document.getElementById(`pdf-container-${dayIndex}`);
-                    if (pdfContainer) {
-                        const isHidden = pdfContainer.style.display === 'none';
-                        pdfContainer.style.display = isHidden ? 'block' : 'none';
-                    }
+                    this.openPdfModal(parseInt(dayIndex, 10));
                 } 
                 else if (prezentaceBtn && window.ObnovaPrezentace) {
                     event.preventDefault();
                     window.ObnovaPrezentace.openPrezentaceModal(prezentaceBtn.dataset.prezentaceSrc);
                 }
             });
+
+            // Přidáme posluchače pro zavření PDF modálu
+            app.elements.pdfModalCloseBtn?.addEventListener('click', () => this.closePdfModal());
+            app.elements.pdfModalOverlay?.addEventListener('click', () => this.closePdfModal());
 
             app.elements.setupBtn?.addEventListener('click', () => this.saveAndRun(app.elements.setupDateInput.value));
             app.elements.settingsBtn?.addEventListener('click', () => this.saveAndRun(app.elements.sideMenuDateInput.value));
