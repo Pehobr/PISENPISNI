@@ -63,8 +63,6 @@ main#content-container {
     touch-action: pan-y;
 }
 
-
-
 main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; text-align: center; }
 .entry-content { font-size: 1rem; color: #342E1C; }
 
@@ -94,7 +92,6 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(40, 20, 5, 0.6); z-index: 99998; display: none;
 }
-/* ZMĚNA: Cílení na kontejner aplikace pro otevření menu */
 #obnova-app-container.menu-open #main-content { transform: translateX(-280px); }
 #obnova-app-container.menu-open #side-menu { transform: translateX(0); }
 
@@ -149,7 +146,6 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     font-weight: bold;
 }
 
-/* === Sjednocený styl pro tlačítka na úvodní obrazovce === */
 #initial-setup-box button,
 #initial-setup-box .info-link {
     display: block;
@@ -270,7 +266,7 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 
 
 /* ========================================================================= */
-/* NOVÉ STYLY PRO TLAČÍTKO POZASTAVENÍ OBNOVY                                 */
+/* STYLY PRO TLAČÍTKO POZASTAVENÍ OBNOVY                                 */
 /* ========================================================================= */
 
 #pause-resume-btn {
@@ -301,14 +297,15 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 }
 
 /* ========================================================================= */
-/* FINÁLNÍ STYLY PRO FIXNÍ AUDIO TLAČÍTKA DOLE (vzhled 3.0)                  */
+/* FINÁLNÍ STYLY PRO FIXNÍ OVLÁDACÍ TLAČÍTKA (vzhled 4.1)                     */
 /* ========================================================================= */
 
-/* Společná základna pro obě tlačítka */
+/* Společná základna pro všechna tlačítka */
 .play-tts-btn {
     position: fixed;
     bottom: 70px;
-    height: 50px; /* Snížíme výšku pro elegantnější ovál */
+    height: 50px;
+    width: 50px; /* Sjednocená šířka */
     border: 2px solid #faf0d8;
     cursor: pointer;
     display: flex;
@@ -317,67 +314,49 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     transition: all 0.2s ease-in-out;
     z-index: 9999;
-
-    /* Sjednocená barevnost pro obě tlačítka */
     background-color: #4e1c05;
     color: #faf0d8;
-    font-weight: bold;
+    font-size: 1.1rem; /* Mírně větší ikona */
+    border-radius: 50%; /* Všechna tlačítka jsou kulatá */
+    padding: 0;
+}
+.play-tts-btn i {
+    margin: 0; /* Ikony jsou přesně na středu */
 }
 
-/* Klasické tlačítko vpravo - zůstává kulaté */
-.play-tts-btn.human-audio {
-    right: 20px;
-    width: 50px; /* Přizpůsobeno výšce */
-    border-radius: 50%;
-    font-size: 1.1rem;
-}
-
-/* AI tlačítko vlevo - nové, oválné */
+/* Specifické pozicování pro každé tlačítko */
 .play-tts-btn.ai-audio {
-    left: 20px;
-    width: auto; /* Šířka se přizpůsobí obsahu */
-    border-radius: 25px; /* Polovina výšky pro dokonalý ovál */
-    padding: 0 18px; /* Vnitřní mezery po stranách */
-    font-size: 1rem;
+    left: 15px;
+}
+.play-tts-btn.presentation {
+    left: 50%;
+    transform: translateX(-50%);
+}
+.play-tts-btn.pdf {
+    right: 15px;
 }
 
-/* Hover efekt pro obě tlačítka */
+/* Hover efekt pro všechna tlačítka */
 .play-tts-btn:hover {
     filter: brightness(130%);
-    transform: scale(1.05);
+    transform: scale(1.05); /* Základní zvětšení pro krajní tlačítka */
 }
 
-/* Společný styl pro obě tlačítka, když přehrávají */
+/* OPRAVA: Speciální hover efekt pro prostřední tlačítko */
+.play-tts-btn.presentation:hover {
+    transform: translateX(-50%) scale(1.05); /* Kombinace transformací, aby se zvětšovalo na místě */
+}
+
+/* Styl pro přehrávané audio tlačítko */
 .play-tts-btn.playing {
     background-color: #d9534f;
     border-color: #fff;
 }
 
+
 /* ========================================================================= */
 /* STYLY PRO MODÁLNÍ OKNO PREZENTACE                                         */
 /* ========================================================================= */
-
-/* Tlačítko pro zobrazení prezentace */
-.show-prezentace-btn {
-    display: block;
-    margin: 25px auto 15px auto;
-    padding: 10px 20px;
-    background-color: #6a2807;
-    color: #faf0d8;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: filter 0.2s ease-in-out;
-}
-.show-prezentace-btn:hover {
-    filter: brightness(120%);
-}
-.show-prezentace-btn i {
-    margin-right: 8px;
-}
-
 
 /* Překryvná vrstva za modálním oknem */
 #modal-overlay {
@@ -428,16 +407,12 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     right: -15px;
     width: 40px;
     height: 40px;
-    
-    /* Změny dle vašeho návrhu */
-    background: transparent; /* Bez bílého kolečka */
-    border: none; /* Bez rámečku */
-    color: #fff; /* Bílý křížek */
-    
-    font-size: 2.5rem; /* Mírně větší křížek pro lepší viditelnost */
-    font-weight: 300;  /* Tenčí, elegantnější křížek */
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Stín pro lepší čitelnost */
-    
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 300;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     cursor: pointer;
     z-index: 10002;
     display: flex;
@@ -451,9 +426,7 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 /* RESPONZIVNÍ ÚPRAVA PRO MODÁL PREZENTACE (MOBILNÍ ZOBRAZENÍ)             */
 /* ========================================================================= */
 
-/* Aplikuje se na všechna zařízení s šířkou do 950px (pokryje mobily na výšku i na šířku) */
 @media screen and (max-width: 950px) {
-    /* Modální okno na celou obrazovku */
     #prezentace-modal {
         width: 100%;
         height: 100%;
@@ -462,10 +435,9 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
         transform: none;
         border-radius: 0;
         padding: 5px;
-        padding-top: 45px; /* Místo pro zavírací tlačítko */
+        padding-top: 45px;
     }
 
-    /* Upravená pozice zavíracího tlačítka */
     #modal-close-btn {
         top: 5px;
         right: 5px;
@@ -473,51 +445,24 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 }
 
 /* ========================================================================= */
-/* DEAKTIVACE PULL-TO-REFRESH V MODÁLU (DEFINITIVNÍ VERZE)                   */
+/* DEAKTIVACE PULL-TO-REFRESH V MODÁLU                                       */
 /* ========================================================================= */
 
-/* Krok 1: Zablokujeme rolování hlavní stránky, když je modál aktivní.
-   Cílíme na všechny možné kontejnery a použijeme !important pro jistotu. */
 html.modal-is-open,
 body.modal-is-open {
     overflow: hidden !important;
 }
 
-/* Krok 2: Samotnému modálnímu oknu povolíme rolování, ale "uvězníme" ho.
-   Toto zabrání "přetečení" scrollu ven a spuštění obnovení stránky. */
 #prezentace-modal {
-    overflow-y: auto; /* Povolí rolování uvnitř modálu, pokud je potřeba */
-    -webkit-overflow-scrolling: touch; /* Vylepšení pro plynulé rolování na iOS */
-    overscroll-behavior-y: contain; /* Klíčová vlastnost pro moderní prohlížeče */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 }
 
-/* === STYL PRO TLAČÍTKO ZOBRAZENÍ PDF === */
-/* Přidáno, aby tlačítko pro PDF vypadalo stejně jako pro prezentaci */
-
-.show-pdf-btn {
-    display: block;
-    margin: 25px auto 15px auto;
-    padding: 10px 20px;
-    background-color: #6a2807;
-    color: #faf0d8;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: filter 0.2s ease-in-out;
-}
-.show-pdf-btn:hover {
-    filter: brightness(120%);
-}
-.show-pdf-btn i {
-    margin-right: 8px;
-}
 /* ========================================================================= */
-/* STYLY PRO MODÁLNÍ OKNO PDF (FINÁLNÍ OPRAVENÁ VERZE)                     */
+/* STYLY PRO MODÁLNÍ OKNO PDF                                                */
 /* ========================================================================= */
 
-/* Překryvná vrstva za modálním oknem */
 #pdf-modal-overlay {
     position: fixed;
     top: 0;
@@ -528,16 +473,15 @@ body.modal-is-open {
     z-index: 10000;
 }
 
-/* Samotné modální okno */
 #pdf-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
-    height: 90vh; /* Použijeme vh pro lepší přizpůsobení výšce obrazovky */
+    height: 90vh;
     max-width: 1100px;
-    max-height: 95%; /* Maximální výška, aby se vešlo na menší obrazovky */
+    max-height: 95%;
     background: #faf0d8;
     z-index: 10001;
     box-shadow: 0 5px 30px rgba(0,0,0,0.5);
@@ -546,20 +490,17 @@ body.modal-is-open {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    /* overflow: hidden; TOTO JSME ODEBRALI, aby byl vidět křížek */
 }
 
-/* Kontejner pro obsah uvnitř modálu */
 #pdf-modal-content {
     width: 100%;
     height: 100%;
     flex-grow: 1;
     border-radius: 5px;
-    overflow: auto; /* TOTO JSME ZMĚNILI, aby bylo možné rolovat */
-    -webkit-overflow-scrolling: touch; /* Vylepšení pro plynulé rolování na iOS */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Tlačítko pro zavření modálu */
 #pdf-modal-close-btn {
     position: absolute;
     top: -15px;

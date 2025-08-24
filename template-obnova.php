@@ -54,7 +54,6 @@ get_header(); // Načte hlavičku vaší šabloně
 
 <div id="app-overlay"></div>
 
-<!-- Modální okno pro Prezentaci -->
 <div id="prezentace-modal" style="display: none;">
     <button id="modal-close-btn" title="Zavřít prezentaci">&times;</button>
     <div id="modal-content">
@@ -63,18 +62,19 @@ get_header(); // Načte hlavičku vaší šabloně
 </div>
 <div id="modal-overlay" style="display: none;"></div>
 
-<!-- NOVÉ: Modální okno pro PDF -->
 <div id="pdf-modal" style="display: none;">
     <button id="pdf-modal-close-btn" title="Zavřít PDF">&times;</button>
     <div id="pdf-modal-content">
-        <!-- Obsah PDF se vloží sem pomocí JavaScriptu -->
-    </div>
+        </div>
 </div>
 <div id="pdf-modal-overlay" style="display: none;"></div>
 
 
-<button class="play-tts-btn human-audio" style="display: none;" title="Přehrát nahlas"><i class="fas fa-headphones-alt"></i></button>
-<button class="play-tts-btn ai-audio" style="display: none;" title="Přehrát AI hlasem">AI&nbsp;&nbsp;<i class="fas fa-headphones-alt"></i></button>
+<button class="play-tts-btn ai-audio" style="display: none;" title="Přehrát AI hlasem"><i class="fas fa-headphones-alt"></i></button>
+
+<button id="show-prezentace-fixed-btn" class="play-tts-btn presentation" style="display: none;" title="Zobrazit prezentaci"><i class="fas fa-chalkboard-teacher"></i></button>
+
+<button id="show-pdf-fixed-btn" class="play-tts-btn pdf" style="display: none;" title="Zobrazit PDF"><i class="fas fa-file-pdf"></i></button>
 
 
 <?php get_footer(); // Načte patičku vaší šablony ?>

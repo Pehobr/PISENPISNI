@@ -25,9 +25,10 @@
             pdfModalOverlay: document.getElementById('pdf-modal-overlay'),
             pdfModalCloseBtn: document.getElementById('pdf-modal-close-btn'),
             pdfModalContent: document.getElementById('pdf-modal-content'),
-            // Audio tlačítka
-            humanAudioBtn: document.querySelector('.play-tts-btn.human-audio'),
+            // Audio a akční tlačítka
             aiAudioBtn: document.querySelector('.play-tts-btn.ai-audio'),
+            prezentaceFixedBtn: document.getElementById('show-prezentace-fixed-btn'),
+            pdfFixedBtn: document.getElementById('show-pdf-fixed-btn'),
         },
         state: {
             schedule: [],
@@ -105,30 +106,23 @@
             const item = app.state.schedule[index];
             if (!app.elements.contentContainer || !item) return;
 
+            // Aktualizace tlačítek
             if (window.ObnovaAudio) window.ObnovaAudio.updateFixedControls(item);
+            this.updateFixedActionButtons(item, index);
 
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
             const finishedMessage = (app.state.isFinished && index === app.state.schedule.length - 1) ? `<p class="finished-message">Duchovní obnova je u konce.</p>` : '';
             const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
-            const prezentaceButtonHTML = item.prezentace_embed_src ? `<button class="show-prezentace-btn" data-prezentace-src="${item.prezentace_embed_src}"><i class="fas fa-chalkboard-teacher"></i>Zobrazit prezentaci</button>` : '';
-
-            // Změna: Generujeme pouze tlačítko, pokud existuje PDF.
-            let pdfButtonHTML = '';
-            if (item.pdf_flipbook_html) {
-                pdfButtonHTML = `
-                    <button class="show-pdf-btn" data-day-index="${index}">
-                        <i class="fas fa-file-pdf"></i> Zobrazit PDF
-                    </button>
-                `;
-            }
+            
+            // ODSTRANĚNO: Tlačítka se již negenerují zde
+            // const prezentaceButtonHTML = ...
+            // const pdfButtonHTML = ...
 
             app.elements.contentContainer.innerHTML = `
                 <article data-day-index="${index}">
                     ${pausedMessage}${finishedMessage}
                     <h2>${item.title || 'Načítání...'}</h2>
                     <div class="entry-content">${item.content || ''}</div>
-                    ${prezentaceButtonHTML}
-                    ${pdfButtonHTML}
                 </article>`;
 
             document.querySelectorAll('.day-link').forEach(link => link.classList.remove('active'));
@@ -139,20 +133,36 @@
             }
         },
 
-        // NOVÁ FUNKCE: Otevření modálního okna s PDF
+        // NOVÁ FUNKCE: Aktualizace fixních tlačítek (Prezentace, PDF)
+        updateFixedActionButtons: function(item, index) {
+            const { prezentaceFixedBtn, pdfFixedBtn } = app.elements;
+
+            const hasPrezentace = item.prezentace_embed_src;
+            if (prezentaceFixedBtn) {
+                prezentaceFixedBtn.style.display = hasPrezentace ? 'flex' : 'none';
+                if (hasPrezentace) {
+                    prezentaceFixedBtn.dataset.prezentaceSrc = item.prezentace_embed_src;
+                }
+            }
+
+            const hasPdf = item.pdf_flipbook_html && item.pdf_flipbook_html.trim() !== '';
+            if (pdfFixedBtn) {
+                pdfFixedBtn.style.display = hasPdf ? 'flex' : 'none';
+                if (hasPdf) {
+                    pdfFixedBtn.dataset.dayIndex = index;
+                }
+            }
+        },
+
         openPdfModal: function(dayIndex) {
             const item = app.state.schedule[dayIndex];
             if (!item || !item.pdf_flipbook_html) return;
 
-            // Vložíme HTML flipbooku do modálního okna
             app.elements.pdfModalContent.innerHTML = item.pdf_flipbook_html;
-            
-            // Zobrazíme modál a překryv
             app.elements.pdfModal.style.display = 'flex';
             app.elements.pdfModalOverlay.style.display = 'block';
             document.body.classList.add('modal-is-open');
 
-            // Klíčový krok: Inicializujeme DearFlip plugin na nově vloženém obsahu
             if (typeof jQuery !== 'undefined' && typeof jQuery.fn.flipBook !== 'undefined') {
                 const newFlipbook = app.elements.pdfModalContent.querySelector('._df_book');
                 if (newFlipbook) {
@@ -161,12 +171,10 @@
             }
         },
 
-        // NOVÁ FUNKCE: Zavření modálního okna s PDF
         closePdfModal: function() {
             app.elements.pdfModal.style.display = 'none';
             app.elements.pdfModalOverlay.style.display = 'none';
             document.body.classList.remove('modal-is-open');
-            // Vyčistíme obsah, aby nezůstával v paměti
             app.elements.pdfModalContent.innerHTML = '';
         },
 
@@ -207,33 +215,34 @@
             document.body.addEventListener('click', (event) => {
                 const target = event.target;
                 const playBtn = target.closest('.play-tts-btn');
-                const prezentaceBtn = target.closest('.show-prezentace-btn');
                 const dayLink = target.closest('.day-link');
-                const pdfBtn = target.closest('.show-pdf-btn');
-
+                
+                // Zjednodušená delegace, stará tlačítka jsou pryč
                 if (dayLink) {
                     event.preventDefault();
                     this.showDay(parseInt(dayLink.dataset.dayIndex, 10));
-                } else if (playBtn && window.ObnovaAudio) {
+                } else if (playBtn && window.ObnovaAudio && playBtn.classList.contains('ai-audio')) {
                     event.preventDefault();
                     window.ObnovaAudio.handleAudioPlayback(playBtn);
-                } 
-                // Změna: Klik na PDF tlačítko nyní volá novou funkci
-                else if (pdfBtn) {
-                    event.preventDefault();
-                    const dayIndex = pdfBtn.dataset.dayIndex;
-                    this.openPdfModal(parseInt(dayIndex, 10));
-                } 
-                else if (prezentaceBtn && window.ObnovaPrezentace) {
-                    event.preventDefault();
-                    window.ObnovaPrezentace.openPrezentaceModal(prezentaceBtn.dataset.prezentaceSrc);
                 }
             });
 
-            // Přidáme posluchače pro zavření PDF modálu
+            // Přidáme posluchače pro nová fixní tlačítka
+            app.elements.prezentaceFixedBtn?.addEventListener('click', () => {
+                if (window.ObnovaPrezentace) {
+                   window.ObnovaPrezentace.openPrezentaceModal(app.elements.prezentaceFixedBtn.dataset.prezentaceSrc);
+               }
+           });
+           app.elements.pdfFixedBtn?.addEventListener('click', () => {
+               const dayIndex = app.elements.pdfFixedBtn.dataset.dayIndex;
+               this.openPdfModal(parseInt(dayIndex, 10));
+           });
+
+            // Posluchače pro zavření modálů
             app.elements.pdfModalCloseBtn?.addEventListener('click', () => this.closePdfModal());
             app.elements.pdfModalOverlay?.addEventListener('click', () => this.closePdfModal());
 
+            // Posluchače pro nastavení
             app.elements.setupBtn?.addEventListener('click', () => this.saveAndRun(app.elements.setupDateInput.value));
             app.elements.settingsBtn?.addEventListener('click', () => this.saveAndRun(app.elements.sideMenuDateInput.value));
         }

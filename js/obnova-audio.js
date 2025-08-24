@@ -58,11 +58,12 @@
         },
 
         handleAudioPause: function() {
-            if (this.currentPlayBtn) {
-                this.currentPlayBtn.innerHTML = this.currentPlayBtn.classList.contains('ai-audio') ? 'AI&nbsp;&nbsp;<i class="fas fa-headphones-alt"></i>' : '<i class="fas fa-headphones-alt"></i>';
-                this.currentPlayBtn.classList.remove('playing');
-            }
-        },
+    if (this.currentPlayBtn) {
+        // Změna: Vždy vrací jen ikonu, bez textu "AI"
+        this.currentPlayBtn.innerHTML = '<i class="fas fa-headphones-alt"></i>';
+        this.currentPlayBtn.classList.remove('playing');
+    }
+},
         
         handleAudioEnded: function() {
             this.handleAudioPause();
