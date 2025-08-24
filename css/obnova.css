@@ -10,7 +10,6 @@
     border-radius: 10px;
     margin: 0px 0;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    min-height: 70vh;
 }
 
 #main-content {
@@ -171,13 +170,6 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 #initial-setup-box button:hover,
 #initial-setup-box .info-link:hover {
     filter: brightness(120%);
-}
-
-
-/* === DOPLNĚNÁ OPRAVA: Skrytí poslední čáry a odstavce v obsahu dne === */
-#content-container .entry-content > hr:last-of-type,
-#content-container .entry-content > p:last-of-type {
-    display: none;
 }
 
 /* ========================================================================= */
@@ -355,44 +347,51 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
 
 
 /* ========================================================================= */
-/* STYLY PRO MODÁLNÍ OKNO PREZENTACE                                         */
+/* STYLY PRO MODÁLNÍ OKNA (SJEDNOCENÉ)                                       */
 /* ========================================================================= */
 
 /* Překryvná vrstva za modálním oknem */
-#modal-overlay {
+#modal-overlay, #pdf-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
+    z-index: 99998; /* OPRAVA: Zvýšený z-index */
 }
 
-/* Samotné modální okno */
-#prezentace-modal {
+/* Společný styl pro obě modální okna */
+#prezentace-modal, #pdf-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
-    height: 80%;
+    height: 90vh; 
     max-width: 1100px;
-    background: #333;
-    z-index: 10001;
+    max-height: 95%; 
+    background: #faf0d8; 
+    z-index: 99999; /* OPRAVA: Zvýšený z-index */
     box-shadow: 0 5px 30px rgba(0,0,0,0.5);
     border-radius: 10px;
-    padding: 20px;
+    padding: 15px; 
     box-sizing: border-box;
+    display: flex; 
+    flex-direction: column; 
 }
 
-/* Kontejner pro iframe uvnitř modálu */
-#modal-content {
+/* Kontejner pro obsah uvnitř modálu */
+#modal-content, #pdf-modal-content {
     width: 100%;
     height: 100%;
+    flex-grow: 1; 
+    border-radius: 5px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Iframe uvnitř modálu */
+/* Iframe uvnitř modálu prezentace */
 #modal-content iframe {
     width: 100%;
     height: 100%;
@@ -400,45 +399,53 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     border-radius: 5px;
 }
 
-/* Tlačítko pro zavření modálu */
-#modal-close-btn {
+/* Společný styl pro obě zavírací tlačítka */
+#modal-close-btn, #pdf-modal-close-btn {
     position: absolute;
-    top: -15px;
-    right: -15px;
+    top: 10px;
+    right: 10px;
     width: 40px;
     height: 40px;
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 2.5rem;
-    font-weight: 300;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    background: #4e1c05;
+    border: 2px solid #faf0d8;
+    border-radius: 50%;
+    color: #faf0d8;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: none;
     cursor: pointer;
-    z-index: 10002;
+    z-index: 100000; /* OPRAVA: Zvýšený z-index */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    line-height: 1;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#modal-close-btn:hover, #pdf-modal-close-btn:hover {
+    transform: scale(1.1);
+    background-color: #6a2807;
 }
 
 /* ========================================================================= */
-/* RESPONZIVNÍ ÚPRAVA PRO MODÁL PREZENTACE (MOBILNÍ ZOBRAZENÍ)             */
+/* RESPONZIVNÍ ÚPRAVY PRO MODÁLNÍ OKNA                                       */
 /* ========================================================================= */
 
 @media screen and (max-width: 950px) {
-    #prezentace-modal {
+    #prezentace-modal, #pdf-modal {
         width: 100%;
         height: 100%;
+        max-height: 100%; 
         top: 0;
         left: 0;
         transform: none;
         border-radius: 0;
         padding: 5px;
-        padding-top: 45px;
+        padding-top: 50px; /* Více místa nahoře pro tlačítko */
     }
 
-    #modal-close-btn {
+    #modal-close-btn, #pdf-modal-close-btn {
         top: 5px;
         right: 5px;
     }
@@ -453,98 +460,8 @@ body.modal-is-open {
     overflow: hidden !important;
 }
 
-#prezentace-modal {
+#prezentace-modal, #pdf-modal {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
-}
-
-/* ========================================================================= */
-/* STYLY PRO MODÁLNÍ OKNO PDF                                                */
-/* ========================================================================= */
-
-#pdf-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
-}
-
-#pdf-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90vh;
-    max-width: 1100px;
-    max-height: 95%;
-    background: #faf0d8;
-    z-index: 10001;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    border-radius: 10px;
-    padding: 15px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-}
-
-#pdf-modal-content {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    border-radius: 5px;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-#pdf-modal-close-btn {
-    position: absolute;
-    top: -15px;
-    right: -15px;
-    width: 40px;
-    height: 40px;
-    background: #4e1c05;
-    border: 2px solid #faf0d8;
-    border-radius: 50%;
-    color: #faf0d8;
-    font-size: 2rem;
-    font-weight: bold;
-    line-height: 1;
-    text-shadow: none;
-    cursor: pointer;
-    z-index: 10002;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-#pdf-modal-close-btn:hover {
-    transform: scale(1.1);
-    background-color: #6a2807;
-}
-
-/* Responzivní úpravy pro PDF modál */
-@media screen and (max-width: 950px) {
-    #pdf-modal {
-        width: 100%;
-        height: 100%;
-        max-height: 100%;
-        top: 0;
-        left: 0;
-        transform: none;
-        border-radius: 0;
-        padding: 5px;
-        padding-top: 45px;
-    }
-
-    #pdf-modal-close-btn {
-        top: 5px;
-        right: 5px;
-    }
 }
