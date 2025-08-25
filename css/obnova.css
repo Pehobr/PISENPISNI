@@ -41,7 +41,8 @@
     padding: 10px 5px;
     overflow-x: auto;
     white-space: nowrap;
-    border-bottom: 1px solid #d1c8b8;
+    /* Změna: Vytvoření vizuálního odstupu pomocí silnějšího okraje */
+    border-bottom: 8px solid #4e1c05;
     -webkit-overflow-scrolling: touch;
 }
 .days-nav-bar::-webkit-scrollbar { display: none; }
