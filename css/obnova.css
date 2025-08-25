@@ -24,7 +24,8 @@
     align-items: center;
     padding: 12px 15px;
     background-color: #e1d8c2;
-    border-bottom: 1px solid #d1c8b8;
+    /* Změna: Vytvoření vizuálního odstupu pomocí silnějšího okraje */
+    border-bottom: 8px solid #4e1c05;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
