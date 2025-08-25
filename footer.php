@@ -45,7 +45,7 @@
             <i class="fas fa-headphones"></i>
             <span>Audio</span>
         </a>
-        <a href="<?php echo esc_url( home_url( '/informace/' ) ); ?>" class="nav-item" aria-label="Info">
+        <a href="<?php echo esc_url( home_url( '/moje-poznamky/' ) ); ?>" class="nav-item" aria-label="Info">
             <i class="fas fa-pen"></i>
             <span>Info</span>
         </a>
