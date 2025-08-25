@@ -90,6 +90,15 @@ function moje_vkladani_dat_do_paticky() {
                     // A převedeme shortcode na finální HTML kód.
                     $pdf_html = do_shortcode( $dynamic_shortcode );
                 }
+                
+                // Načtení štítků (tags) pro daný příspěvek
+                $post_tags = get_the_tags();
+                $tags_array = array();
+                if ( $post_tags ) {
+                    foreach( $post_tags as $tag ) {
+                        $tags_array[] = $tag->slug; // Ukládáme slug štítku
+                    }
+                }
                 // === ZMĚNA KONČÍ ZDE ===
 
                 $obnova_data[] = array(
@@ -99,7 +108,8 @@ function moje_vkladani_dat_do_paticky() {
                     'audio_url' => $audio_url,
                     'ai_audio_url' => $ai_audio_url,
                     'prezentace_embed_src' => $prezentace_src,
-                    'pdf_flipbook_html' => $pdf_html // Přidáme hotové HTML do dat pro JavaScript
+                    'pdf_flipbook_html' => $pdf_html, // Přidáme hotové HTML do dat pro JavaScript
+                    'tags' => $tags_array // Přidáme pole se štítky
                 );
                 $day_counter++;
             }

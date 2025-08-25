@@ -29,6 +29,9 @@
             aiAudioBtn: document.querySelector('.play-tts-btn.ai-audio'),
             prezentaceFixedBtn: document.getElementById('show-prezentace-fixed-btn'),
             pdfFixedBtn: document.getElementById('show-pdf-fixed-btn'),
+            // NOVÉ: Elementy pro výběr typu obnovy
+            initialTypeSelectors: document.querySelectorAll('input[name="initial_obnova_type"]'),
+            menuTypeSelectors: document.querySelectorAll('input[name="menu_obnova_type"]'),
         },
         state: {
             schedule: [],
@@ -56,13 +59,28 @@
                 console.error('Chyba: Data aplikace (obnovaApp) nebyla nalezena.');
                 return;
             }
-            const { posts, sundayPost } = obnovaApp;
+            
             const startDateString = localStorage.getItem('obnovaStartDate');
+            const obnovaType = localStorage.getItem('obnovaType') || 'full'; // Načteme typ, výchozí je 'full'
+
+            // Synchronizujeme UI přepínače podle uložené hodnoty
+            this.syncTypeSelectors(obnovaType);
+
             if (!startDateString) {
                 app.elements.setupOverlay.style.display = 'flex';
                 return;
             }
             app.elements.setupOverlay.style.display = 'none';
+            
+            // FILTRACE PŘÍSPĚVKŮ PODLE TYPU OBNOVY
+            let filteredPosts = obnovaApp.posts;
+            if (obnovaType === 'lent') {
+                filteredPosts = obnovaApp.posts.filter(post => 
+                    !post.tags.includes('uvod') && !post.tags.includes('zaver')
+                );
+            }
+            
+            const { sundayPost } = obnovaApp;
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
             const startDate = new Date(startDateString);
             const today = isPaused ? new Date(localStorage.getItem('obnovaPausedDate')) : new Date();
@@ -76,6 +94,7 @@
             }
             app.state.schedule = [];
             let postIndex = 0;
+            let displayDayCounter = 1; // <<< ZMĚNA: Počítadlo pro zobrazované dny
             const totalDaysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             for (let i = 0; i <= totalDaysElapsed; i++) {
                 const currentDate = new Date(startDate.getTime());
@@ -83,15 +102,22 @@
                 if (currentDate.getDay() === 0) {
                     app.state.schedule.push({ type: 'sunday', ...sundayPost });
                 } else {
-                    if (postIndex < posts.length) {
-                        app.state.schedule.push({ type: 'post', ...posts[postIndex] });
+                    if (postIndex < filteredPosts.length) {
+                        // <<< ZMĚNA: Přidáme novou vlastnost 'displayDay'
+                        const postItem = { 
+                            type: 'post', 
+                            ...filteredPosts[postIndex], 
+                            displayDay: displayDayCounter 
+                        };
+                        app.state.schedule.push(postItem);
                         postIndex++;
+                        displayDayCounter++;
                     } else {
                         break;
                     }
                 }
             }
-            app.state.isFinished = postIndex >= posts.length;
+            app.state.isFinished = postIndex >= filteredPosts.length;
             const activeDayIndex = app.state.schedule.length - 1;
             this.generateDaysNav();
             this.showDay(activeDayIndex);
@@ -109,7 +135,6 @@
             this.updateFixedActionButtons(item, index);
 
             if (item.type === 'sunday') {
-                // --- NOVÁ LOGIKA PRO NEDĚLI ---
                 let sundayContentHTML = `
                     <article data-day-index="${index}">
                         <h2>${item.title || 'Nedělní ohlédnutí'}</h2>
@@ -127,9 +152,10 @@
                         const inspirationHtml = this.extractInspiration(dayItem.content);
                         if (inspirationHtml) {
                             inspirationFound = true;
+                            // <<< ZMĚNA: Použijeme 'displayDay' pro nadpis
                             sundayContentHTML += `
                                 <div class="summary-item">
-                                    <h4>Den ${dayItem.day}: ${dayItem.title}</h4>
+                                    <h4>Den ${dayItem.displayDay}: ${dayItem.title}</h4>
                                     <div>${inspirationHtml}</div>
                                 </div>
                             `;
@@ -148,7 +174,6 @@
                 `;
                 app.elements.contentContainer.innerHTML = sundayContentHTML;
             } else {
-                // --- PŮVODNÍ LOGIKA PRO BĚŽNÉ DNY ---
                 const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
                 const finishedMessage = (app.state.isFinished && index === app.state.schedule.length - 1) ? `<p class="finished-message">Duchovní obnova je u konce.</p>` : '';
                 const pausedMessage = isPaused ? `<p class="paused-message">Obnova je pozastavena.</p>` : '';
@@ -169,7 +194,6 @@
             }
         },
         
-        // Pomocná funkce pro extrakci obsahu "Inspirace"
         extractInspiration: function(htmlContent) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
@@ -234,12 +258,13 @@
         },
 
         generateDaysNav: function() {
+            // <<< ZMĚNA: Použijeme 'displayDay' pro text odkazu
             app.elements.daysNav.innerHTML = app.state.schedule.map((item, index) =>
-                `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.day}`}</a>`
+                `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.displayDay}`}</a>`
             ).join('');
         },
         
-        saveAndRun: function(dateValue) {
+        saveAndRun: function(dateValue, typeValue) {
             if (!dateValue) {
                 alert('Prosím, zvolte datum začátku.');
                 return;
@@ -255,13 +280,24 @@
                 return;
             }
             localStorage.setItem('obnovaStartDate', dateValue);
+            localStorage.setItem('obnovaType', typeValue);
             localStorage.removeItem('obnovaIsPaused');
             localStorage.removeItem('obnovaPausedDate');
             if (app.elements.sideMenuDateInput) app.elements.sideMenuDateInput.value = dateValue;
             if (app.elements.setupDateInput) app.elements.setupDateInput.value = dateValue;
+            this.syncTypeSelectors(typeValue);
             if (window.ObnovaMenu) window.ObnovaMenu.toggleMenu(false);
             if (window.ObnovaMenu) window.ObnovaMenu.updatePauseButtonUI();
             this.run();
+        },
+
+        syncTypeSelectors: function(type) {
+            app.elements.initialTypeSelectors.forEach(radio => {
+                radio.checked = radio.value === type;
+            });
+            app.elements.menuTypeSelectors.forEach(radio => {
+                radio.checked = radio.value === type;
+            });
         },
 
         setupEventListeners: function() {
@@ -292,8 +328,14 @@
             app.elements.pdfModalCloseBtn?.addEventListener('click', () => this.closePdfModal());
             app.elements.pdfModalOverlay?.addEventListener('click', () => this.closePdfModal());
 
-            app.elements.setupBtn?.addEventListener('click', () => this.saveAndRun(app.elements.setupDateInput.value));
-            app.elements.settingsBtn?.addEventListener('click', () => this.saveAndRun(app.elements.sideMenuDateInput.value));
+            app.elements.setupBtn?.addEventListener('click', () => {
+                const selectedType = document.querySelector('input[name="initial_obnova_type"]:checked').value;
+                this.saveAndRun(app.elements.setupDateInput.value, selectedType);
+            });
+            app.elements.settingsBtn?.addEventListener('click', () => {
+                const selectedType = document.querySelector('input[name="menu_obnova_type"]:checked').value;
+                this.saveAndRun(app.elements.sideMenuDateInput.value, selectedType);
+            });
         }
     };
 

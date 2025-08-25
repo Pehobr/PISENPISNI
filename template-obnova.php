@@ -13,10 +13,24 @@ get_header(); // Načte hlavičku vaší šabloně
         <div id="initial-setup-box">
             <h2>Duchovní obnova</h2>
             <a href="https://pisenpisni.audiokatechismus.cz/informace-o-obnove/" class="info-link">Podrobnosti</a>
+            
+            <!-- === ZMĚNA ZAČÍNÁ ZDE: Přidání volby typu obnovy === -->
+            <div class="obnova-type-selector">
+                <label>
+                    <input type="radio" name="initial_obnova_type" value="full" checked>
+                    <span>Plná obnova (90 dní)</span>
+                </label>
+                <label>
+                    <input type="radio" name="initial_obnova_type" value="lent">
+                    <span>Postní obnova (40+ dní)</span>
+                </label>
+            </div>
+            <!-- === ZMĚNA KONČÍ ZDE === -->
+
             <p>Zvolte si, od kterého dne chcete obnovu začít.</p>
             <label for="initial-start-date">Datum začátku obnovy:</label>
             <input type="date" id="initial-start-date">
-            <button id="initial-save-btn">Nastavit datum</button>
+            <button id="initial-save-btn">Nastavit a spustit</button>
         </div>
     </div>
 
@@ -27,7 +41,21 @@ get_header(); // Načte hlavičku vaší šabloně
         </div>
         <div class="side-menu-content">
             <div id="settings">
-                <h5>Nastavení data</h5>
+                <h5>Nastavení</h5>
+                
+                <!-- === ZMĚNA ZAČÍNÁ ZDE: Přidání volby typu obnovy do menu === -->
+                <div class="obnova-type-selector side-menu-selector">
+                    <label>
+                        <input type="radio" name="menu_obnova_type" value="full">
+                        <span>90denní obnova</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="menu_obnova_type" value="lent">
+                        <span>45denní obnova</span>
+                    </label>
+                </div>
+                <!-- === ZMĚNA KONČÍ ZDE === -->
+
                 <label for="start-date-input">Datum začátku obnovy:</label>
                 <input type="date" id="start-date-input">
                 <button id="save-settings-btn">Uložit a načíst</button>

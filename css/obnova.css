@@ -175,6 +175,34 @@ main#content-container h2 { font-size: 1.2rem; margin-top: 0; color: #342E1C; te
     filter: brightness(120%);
 }
 
+/* === NOVÉ STYLY PRO VÝBĚR TYPU OBNOVY === */
+.obnova-type-selector {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f7f2e9;
+    border-radius: 8px;
+    border: 1px solid #e1d8c2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.obnova-type-selector label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+}
+.obnova-type-selector input[type="radio"] {
+    margin-right: 10px;
+}
+.side-menu-selector {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+/* ======================================== */
+
+
 /* ========================================================================= */
 /* VLASTNÍ STYLY PRO WORDPRESS AUDIO PŘEHRÁVAČ (MEDIAELEMENT.JS)             */
 /* ========================================================================= */
