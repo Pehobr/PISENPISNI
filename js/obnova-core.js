@@ -72,34 +72,28 @@
             }
             app.elements.setupOverlay.style.display = 'none';
             
-            // === ZMĚNA ZAČÍNÁ ZDE: Rozšířená logika filtrování ===
             let filteredPosts;
             switch (obnovaType) {
                 case 'lent':
-                    // Postní obnova: Všechny příspěvky KROMĚ úvodu a závěru
                     filteredPosts = obnovaApp.posts.filter(post => 
                         !post.tags.includes('uvod') && !post.tags.includes('zaver')
                     );
                     break;
                 case 'bible':
-                    // Biblická obnova: POUZE příspěvky s tagem 'uvod'
                     filteredPosts = obnovaApp.posts.filter(post => 
                         post.tags.includes('uvod')
                     );
                     break;
                 case 'cinderella':
-                    // Popelka nazaretská: POUZE příspěvky s tagem 'zaver'
                     filteredPosts = obnovaApp.posts.filter(post => 
                         post.tags.includes('zaver')
                     );
                     break;
                 case 'full':
                 default:
-                    // Plná obnova: Všechny příspěvky
                     filteredPosts = obnovaApp.posts;
                     break;
             }
-            // === ZMĚNA KONČÍ ZDE ===
             
             const { sundayPost } = obnovaApp;
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
@@ -155,35 +149,46 @@
             this.updateFixedActionButtons(item, index);
 
             if (item.type === 'sunday') {
+                // === ZMĚNA ZAČÍNÁ ZDE: Dynamické nedělní shrnutí ===
+                const obnovaType = localStorage.getItem('obnovaType') || 'full';
+                
+                let summaryTitle = 'Inspirace, které nás provázely uplynulým týdnem:';
+                let accordionTitleToExtract = 'Inspirace';
+
+                if (obnovaType === 'cinderella') {
+                    summaryTitle = 'Modlitby, které nás provázely uplynulým týdnem:';
+                    accordionTitleToExtract = 'Modlitba';
+                }
+
                 let sundayContentHTML = `
                     <article data-day-index="${index}">
                         <h2>${item.title || 'Nedělní ohlédnutí'}</h2>
                         <div class="entry-content">
-                            <p style="text-align: center; font-style: italic;">Inspirace, které nás provázely uplynulým týdnem:</p>
+                            <p style="text-align: center; font-style: italic;">${summaryTitle}</p>
                             <div class="sunday-summary">
                 `;
 
                 const startIndex = Math.max(0, index - 6);
                 const weekDays = app.state.schedule.slice(startIndex, index);
-                let inspirationFound = false;
+                let contentFound = false;
 
                 weekDays.forEach(dayItem => {
                     if (dayItem.type === 'post') {
-                        const inspirationHtml = this.extractInspiration(dayItem.content);
-                        if (inspirationHtml) {
-                            inspirationFound = true;
+                        const extractedHtml = this.extractAccordionContent(dayItem.content, accordionTitleToExtract);
+                        if (extractedHtml) {
+                            contentFound = true;
                             sundayContentHTML += `
                                 <div class="summary-item">
                                     <h4>Den ${dayItem.displayDay}: ${dayItem.title}</h4>
-                                    <div>${inspirationHtml}</div>
+                                    <div>${extractedHtml}</div>
                                 </div>
                             `;
                         }
                     }
                 });
 
-                if (!inspirationFound) {
-                    sundayContentHTML += '<p style="text-align: center;">Pro tento týden nebyly nalezeny žádné inspirace.</p>';
+                if (!contentFound) {
+                    sundayContentHTML += `<p style="text-align: center;">Pro tento týden nebyly nalezeny žádné relevantní texty.</p>`;
                 }
 
                 sundayContentHTML += `
@@ -192,6 +197,8 @@
                     </article>
                 `;
                 app.elements.contentContainer.innerHTML = sundayContentHTML;
+                // === ZMĚNA KONČÍ ZDE ===
+
             } else {
                 const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
                 const finishedMessage = (app.state.isFinished && index === app.state.schedule.length - 1) ? `<p class="finished-message">Duchovní obnova je u konce.</p>` : '';
@@ -213,13 +220,14 @@
             }
         },
         
-        extractInspiration: function(htmlContent) {
+        // === ZMĚNA ZDE: Univerzální funkce pro extrakci obsahu z harmoniky ===
+        extractAccordionContent: function(htmlContent, accordionTitle) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             const accordionItems = tempDiv.querySelectorAll('.accordion-item');
             for (const item of accordionItems) {
                 const button = item.querySelector('.accordion-toggle');
-                if (button && button.textContent.trim() === 'Inspirace') {
+                if (button && button.textContent.trim() === accordionTitle) {
                     const hiddenTextDiv = item.querySelector('.hidden-text');
                     if (hiddenTextDiv) {
                         const contentClone = hiddenTextDiv.cloneNode(true);
