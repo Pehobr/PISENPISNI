@@ -46,7 +46,7 @@
             <span>Audio</span>
         </a>
         <a href="<?php echo esc_url( home_url( '/informace/' ) ); ?>" class="nav-item" aria-label="Info">
-            <i class="fas fa-info-circle"></i>
+            <i class="fas fa-pen"></i>
             <span>Info</span>
         </a>
     </footer>
