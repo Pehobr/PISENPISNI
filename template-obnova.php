@@ -14,15 +14,23 @@ get_header(); // Načte hlavičku vaší šabloně
             <h2>Duchovní obnova</h2>
             <a href="https://pisenpisni.audiokatechismus.cz/informace-o-obnove/" class="info-link">Podrobnosti</a>
             
-            <!-- === ZMĚNA ZAČÍNÁ ZDE: Přidání volby typu obnovy === -->
+            <!-- === ZMĚNA ZAČÍNÁ ZDE: Aktualizované názvy obnov === -->
             <div class="obnova-type-selector">
                 <label>
                     <input type="radio" name="initial_obnova_type" value="full" checked>
-                    <span>Plná obnova (90 dní)</span>
+                    <span>Kompletní obnova (90 dní)</span>
                 </label>
                 <label>
                     <input type="radio" name="initial_obnova_type" value="lent">
-                    <span>Postní obnova (40+ dní)</span>
+                    <span>Srdce obnovy (45 dní)</span>
+                </label>
+                <label>
+                    <input type="radio" name="initial_obnova_type" value="bible">
+                    <span>Biblické základy (18 dní)</span>
+                </label>
+                <label>
+                    <input type="radio" name="initial_obnova_type" value="cinderella">
+                    <span>Popelka nazaretská (19 dní)</span>
                 </label>
             </div>
             <!-- === ZMĚNA KONČÍ ZDE === -->
@@ -43,15 +51,23 @@ get_header(); // Načte hlavičku vaší šabloně
             <div id="settings">
                 <h5>Nastavení</h5>
                 
-                <!-- === ZMĚNA ZAČÍNÁ ZDE: Přidání volby typu obnovy do menu === -->
+                <!-- === ZMĚNA ZAČÍNÁ ZDE: Aktualizované názvy obnov v menu === -->
                 <div class="obnova-type-selector side-menu-selector">
                     <label>
                         <input type="radio" name="menu_obnova_type" value="full">
-                        <span>90denní obnova</span>
+                        <span>Kompletní obnova (90 dní)</span>
                     </label>
                     <label>
                         <input type="radio" name="menu_obnova_type" value="lent">
-                        <span>45denní obnova</span>
+                        <span>Srdce obnovy (45 dní)</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="menu_obnova_type" value="bible">
+                        <span>Biblické základy (18 dní)</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="menu_obnova_type" value="cinderella">
+                        <span>Popelka nazaretská (19 dní)</span>
                     </label>
                 </div>
                 <!-- === ZMĚNA KONČÍ ZDE === -->

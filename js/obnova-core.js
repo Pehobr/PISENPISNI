@@ -72,13 +72,34 @@
             }
             app.elements.setupOverlay.style.display = 'none';
             
-            // FILTRACE PŘÍSPĚVKŮ PODLE TYPU OBNOVY
-            let filteredPosts = obnovaApp.posts;
-            if (obnovaType === 'lent') {
-                filteredPosts = obnovaApp.posts.filter(post => 
-                    !post.tags.includes('uvod') && !post.tags.includes('zaver')
-                );
+            // === ZMĚNA ZAČÍNÁ ZDE: Rozšířená logika filtrování ===
+            let filteredPosts;
+            switch (obnovaType) {
+                case 'lent':
+                    // Postní obnova: Všechny příspěvky KROMĚ úvodu a závěru
+                    filteredPosts = obnovaApp.posts.filter(post => 
+                        !post.tags.includes('uvod') && !post.tags.includes('zaver')
+                    );
+                    break;
+                case 'bible':
+                    // Biblická obnova: POUZE příspěvky s tagem 'uvod'
+                    filteredPosts = obnovaApp.posts.filter(post => 
+                        post.tags.includes('uvod')
+                    );
+                    break;
+                case 'cinderella':
+                    // Popelka nazaretská: POUZE příspěvky s tagem 'zaver'
+                    filteredPosts = obnovaApp.posts.filter(post => 
+                        post.tags.includes('zaver')
+                    );
+                    break;
+                case 'full':
+                default:
+                    // Plná obnova: Všechny příspěvky
+                    filteredPosts = obnovaApp.posts;
+                    break;
             }
+            // === ZMĚNA KONČÍ ZDE ===
             
             const { sundayPost } = obnovaApp;
             const isPaused = localStorage.getItem('obnovaIsPaused') === 'true';
@@ -94,7 +115,7 @@
             }
             app.state.schedule = [];
             let postIndex = 0;
-            let displayDayCounter = 1; // <<< ZMĚNA: Počítadlo pro zobrazované dny
+            let displayDayCounter = 1; 
             const totalDaysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             for (let i = 0; i <= totalDaysElapsed; i++) {
                 const currentDate = new Date(startDate.getTime());
@@ -103,7 +124,6 @@
                     app.state.schedule.push({ type: 'sunday', ...sundayPost });
                 } else {
                     if (postIndex < filteredPosts.length) {
-                        // <<< ZMĚNA: Přidáme novou vlastnost 'displayDay'
                         const postItem = { 
                             type: 'post', 
                             ...filteredPosts[postIndex], 
@@ -152,7 +172,6 @@
                         const inspirationHtml = this.extractInspiration(dayItem.content);
                         if (inspirationHtml) {
                             inspirationFound = true;
-                            // <<< ZMĚNA: Použijeme 'displayDay' pro nadpis
                             sundayContentHTML += `
                                 <div class="summary-item">
                                     <h4>Den ${dayItem.displayDay}: ${dayItem.title}</h4>
@@ -258,7 +277,6 @@
         },
 
         generateDaysNav: function() {
-            // <<< ZMĚNA: Použijeme 'displayDay' pro text odkazu
             app.elements.daysNav.innerHTML = app.state.schedule.map((item, index) =>
                 `<a href="#" class="day-link" data-day-index="${index}">${item.type === 'sunday' ? 'Neděle' : `Den ${item.displayDay}`}</a>`
             ).join('');
