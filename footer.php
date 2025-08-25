@@ -29,7 +29,7 @@
     <!-- GLOBÁLNÍ SPODNÍ NAVIGAČNÍ LIŠTA                                           -->
     <!-- ========================================================================= -->
     <footer class="app-bottom-nav">
-        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="nav-item" aria-label="Home">
+        <a href="<?php echo esc_url( home_url( '/home/' ) ); ?>" class="nav-item" aria-label="Home">
             <i class="fas fa-home"></i>
             <span>Domů</span>
         </a>

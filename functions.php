@@ -150,4 +150,25 @@ function moje_inline_css_overrides() {
         ";
         echo '<style type="text/css" id="moje-overrides">' . $custom_css . '</style>';
     }
+
+    // Nová podmínka pro skrytí nadpisu na stránce 'home'
+    if ( is_page('home') ) {
+        $custom_css_home = "
+            #loop-meta { display: none !important; }
+        ";
+        echo '<style type="text/css" id="moje-home-override">' . $custom_css_home . '</style>';
+    }
+}
+
+/**
+ * Přesměrování domovské stránky na stránku Duchovní obnovy.
+ */
+add_action( 'template_redirect', 'presmeruj_domovskou_stranku' );
+function presmeruj_domovskou_stranku() {
+    // Zkontroluje, zda se jedná o hlavní (domovskou) stránku
+    if ( is_front_page() ) {
+        // Přesměruje na stránku s URL slugem 'duchovni-obnova'
+        wp_redirect( home_url( '/duchovni-obnova/' ), 301 );
+        exit;
+    }
 }
